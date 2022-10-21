@@ -5,11 +5,23 @@ resource "aws_instance" "public" {
   key_name                    = "main"
   vpc_security_group_ids      = [aws_security_group.public.id]
   subnet_id                   = aws_subnet.public[0].id
+  
   tags = {
     Name = "${var.env_code}-public"
   }
 }
 
+resource "aws_instance" "private" {
+  ami                    = "ami-089a545a9ed9893b6"
+  instance_type          = "t3.micro"
+  key_name               = "main"
+  vpc_security_group_ids = [aws_security_group.private.id]
+  subnet_id              = aws_subnet.private[0].id
+  
+  tags = {
+    Name = "${var.env_code}-private"
+  }
+}
 
 resource "aws_security_group" "public" {
   name        = "${var.env_code}-public"
@@ -22,7 +34,6 @@ resource "aws_security_group" "public" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["71.140.147.152/32"]
-
   }
 
   egress {
@@ -37,18 +48,6 @@ resource "aws_security_group" "public" {
   }
 }
 
-resource "aws_instance" "private" {
-  ami                    = "ami-089a545a9ed9893b6"
-  instance_type          = "t3.micro"
-  key_name               = "main"
-  vpc_security_group_ids = [aws_security_group.private.id]
-  subnet_id              = aws_subnet.private[0].id
-  tags = {
-    Name = "${var.env_code}-private"
-  }
-}
-
-
 resource "aws_security_group" "private" {
   name        = "${var.env_code}-private"
   description = "Allow VPC traffic"
@@ -60,7 +59,6 @@ resource "aws_security_group" "private" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
-
   }
 
   egress {
